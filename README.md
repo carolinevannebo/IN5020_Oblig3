@@ -45,11 +45,11 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 3. `Java Simulator 100 20`
 
 ### Work distribution
-| Caroline | Liang  |
-|----------|--------|
-| item     | item   |
-| item     | item   |
-| item     | item   |
+| Caroline            | Liang  |
+|---------------------|--------|
+| buildOverlayNetwork | item   |
+| buildFingerTable    | item   |
+| item                | item   |
 
 **Not implemented yet:**
 - ChordProtocolSimulator.java

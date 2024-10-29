@@ -3,6 +3,7 @@ package protocol;
 
 import crypto.ConsistentHashing;
 import p2p.NetworkInterface;
+import p2p.NodeInterface;
 
 
 import java.util.*;
@@ -71,9 +72,39 @@ public class ChordProtocol implements Protocol{
      *           3)     add neighbor to the peer (uses Peer.addNeighbor() method)
      */
     public void buildOverlayNetwork(){
-        /*
-        implement this logic
+        /** 1. initialize: for each node in topology, generate a hash-value using consistent hashing and set the node index
+         *  2. sort: sort nodes by id to ensure ring topology
+         *  3. update topology: clear LinkedHashMap and repopulate it with sorted nodes to maintain order
+         *  4. add neighbor: to maintain ring, loop through sorted nodes,
+         *      for each node find the next
+         *      using modulo to ensure that the ring "wraps around",
+         *      ie that the last node connects back to the first node
          */
+        LinkedHashMap<String, NodeInterface> topology = network.getTopology();
+        for (Map.Entry<String, NodeInterface> entry : topology.entrySet()) {
+            String nodeName = entry.getKey();
+            int nodeIndex = ch.hash(nodeName); // consistent hashing
+            NodeInterface node = entry.getValue();
+            node.setId(nodeIndex);
+        }
+
+        // sort nodes by id to ensure ring topology
+        List<Map.Entry<String, NodeInterface>> sortedNodes = new ArrayList<>(topology.entrySet());
+        sortedNodes.sort(Comparator.comparingInt(entry -> entry.getValue().getId()));
+
+        // clear and replace topology with sorted nodes
+        topology.clear();
+        for (Map.Entry<String, NodeInterface> entry : sortedNodes) {
+            topology.put(entry.getKey(), entry.getValue());
+        }
+
+        // add neighbour to peer node
+        int nodeCount = sortedNodes.size();
+        for (int i = 0; i < nodeCount; i++) {
+            NodeInterface currentNode = sortedNodes.get(i).getValue();
+            NodeInterface nextNode = sortedNodes.get((i + 1) % nodeCount).getValue(); // ensure ring topology by wrapping around
+            currentNode.addNeighbor(nextNode.getName(), nextNode);
+        }
     }
 
     /**
@@ -88,16 +119,14 @@ public class ChordProtocol implements Protocol{
      *     3) node - first node in the ring that is responsible for indexes in the interval
      */
     public void buildFingerTable() {
-        /*
-        implement this logic
-         */
+
     }
 
     /**
      * This method performs the lookup operation.
      *  Given the key index, it starts with one of the node in the network and follows through the finger table.
      *  The correct successors would be identified and the request would be checked in their finger tables successively.
-     *   Finally the request will reach the node that contains the data item.
+     *   Finally, the request will reach the node that contains the data item.
      *
      * @param keyIndex index of the key
      * @return names of nodes that have been searched and the final node that contains the key
