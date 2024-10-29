@@ -20,8 +20,6 @@ public interface NodeInterface {
      */
     void setId(int id);
 
-    //
-
     /**
      * Node consists of set of neighbors. It returns the corresponding neighbor given the name of the neighbor.
      * @param name name of the neighbor

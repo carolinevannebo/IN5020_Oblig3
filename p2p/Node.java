@@ -2,13 +2,7 @@ package p2p;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-
-/*
-
- */
-
 /**
  * This class simulates the nodes in the network. Each node has a name, id, neighbors (set of other nodes), routing
  * table and data.
@@ -88,26 +82,23 @@ public class Node implements NodeInterface{
         return this.neighbors.entrySet().iterator().next().getValue();
     }
 
-    public void print(){
-        System.out.print("Node : "+ this.getName());
-        System.out.print("\tIndex: "+this.getId());
-        Collection<NodeInterface> neightbors = this.getNeighbors();
+    public void print() {
+        System.out.print("Node : " + this.getName());
+        System.out.print("\tIndex: " + this.getId());
+        Collection<NodeInterface> neighbors = this.getNeighbors();
         System.out.print("\tNeighbors: ");
-        for(NodeInterface node : neightbors){
-            System.out.print(node.getName()+"\t");
+        for (NodeInterface node : neighbors) {
+            System.out.print(node.getName() + "\t");
         }
         // Note: This introduces backward dependency on the protocols. The protocol should implement a routing table
         // in a way that overrides the toString() method. so that the contents of the routing table can be printed
         // here
-        if(routingTable!=null){
-            System.out.print("\t"+this.routingTable.toString());
+        if (routingTable != null) {
+            System.out.print("\t" + this.routingTable.toString());
         }
         System.out.println();
-        if(data!=null){
-            System.out.println("Data : "+this.data.toString());
+        if (data != null) {
+            System.out.println("Data : " + this.data.toString());
         }
-
-
     }
-
 }

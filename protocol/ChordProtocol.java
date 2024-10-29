@@ -1,6 +1,5 @@
 package protocol;
 
-
 import crypto.ConsistentHashing;
 import fingertable.FingerTable;
 import fingertable.FingerTableEntry;
@@ -8,28 +7,26 @@ import fingertable.Interval;
 import p2p.NetworkInterface;
 import p2p.NodeInterface;
 
-
 import java.util.*;
 
 /**
- * This class implements the chord protocol. The protocol is tested using the custom built simulator.
+ * This class implements the chord protocol. The protocol is tested using the custom-built simulator.
  */
-public class ChordProtocol implements Protocol{
-
+public class ChordProtocol implements Protocol {
     // length of the identifier that is used for consistent hashing
     public int m;
 
     // network object
     public NetworkInterface network;
 
-    // consisent hasing object
+    // consistent hashing object
     public ConsistentHashing ch;
 
     // key indexes. tuples of (<key name>, <key index>)
     public HashMap<String, Integer> keyIndexes;
 
 
-    public ChordProtocol(int m){
+    public ChordProtocol(int m) {
         this.m = m;
         setHashFunction();
         this.keyIndexes = new HashMap<String, Integer>();
@@ -74,7 +71,7 @@ public class ChordProtocol implements Protocol{
      *           2)     find neighbor based on consistent hash (neighbor should be next to the current node in the ring)
      *           3)     add neighbor to the peer (uses Peer.addNeighbor() method)
      */
-    public void buildOverlayNetwork(){
+    public void buildOverlayNetwork() {
         /** 1. initialize: for each node in topology, generate a hash-value using consistent hashing and set the node index
          *  2. sort: sort nodes by id to ensure ring topology
          *  3. update topology: clear LinkedHashMap and repopulate it with sorted nodes to maintain order
@@ -170,7 +167,7 @@ public class ChordProtocol implements Protocol{
      * @param keyIndex index of the key
      * @return names of nodes that have been searched and the final node that contains the key
      */
-    public LookUpResponse lookUp(int keyIndex){
+    public LookUpResponse lookUp(int keyIndex) {
         /*
         implement this logic
          */

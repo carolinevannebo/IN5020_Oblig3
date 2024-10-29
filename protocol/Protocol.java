@@ -1,8 +1,6 @@
 package protocol;
 
-
 import p2p.NetworkInterface;
-
 import java.util.HashMap;
 
 public interface Protocol {
@@ -24,7 +22,6 @@ public interface Protocol {
      * @param keyIndexes - indexes of keys
      */
     public void setKeys(HashMap<String, Integer> keyIndexes);
-
 
     /**
      * This method builds the overlay network.  It assumes the network object has already been set. It generates indexes

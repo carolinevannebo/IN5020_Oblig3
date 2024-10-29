@@ -1,6 +1,5 @@
 package crypto;
 
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -39,7 +38,7 @@ public class ConsistentHashing {
      * @param data the data can be any String object that needs to get hash value
      * @return hash value (the integer value from 0 to 2^m that indicates the placement of data in the ring).
      */
-    public int hash(String data){
+    public int hash(String data) {
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
@@ -48,6 +47,7 @@ public class ConsistentHashing {
         }
         // digest() method is called to calculate message digest
         // of an input digest() return array of byte
+        assert md != null;
         byte[] messageDigest = md.digest(data.getBytes());
 
         // Convert byte array into signum representation
@@ -61,24 +61,23 @@ public class ConsistentHashing {
 
     }
 
-    public static void test1(){
+    public static void test1() {
         ConsistentHashing ch = new ConsistentHashing(3);
-        String nodes[] ={"Node 1", "Node 2", "Node 3", "Node 4"};
-        for(int i=0; i< nodes.length; i++)
-            System.out.println( ch.hash(nodes[i]));
-
+        String[] nodes ={"Node 1", "Node 2", "Node 3", "Node 4"};
+        for (String node : nodes) System.out.println(ch.hash(node));
     }
 
-    public static void test2(){
+    public static void test2() {
         ConsistentHashing ch = new ConsistentHashing(20);
         int length = 1000;
-        String nodes[] = new String[length];
+        String[] nodes = new String[length];
         Set<Integer> set = new HashSet<Integer>();
         ArrayList<Integer> res = new ArrayList<Integer>();
-        for(int i=0; i<length;i++){
+
+        for (int i = 0; i < length; i++) {
             nodes[i] = "Node "+(i+1);
         }
-        for(int i=0; i< length; i++) {
+        for (int i = 0; i < length; i++) {
             res.add(ch.hash(nodes[i]));
             set.add(ch.hash(nodes[i]));
         }

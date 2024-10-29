@@ -1,5 +1,3 @@
-
-
 import p2p.Network;
 import p2p.NetworkInterface;
 import p2p.NodeInterface;
@@ -32,10 +30,10 @@ public class ChordProtocolSimulator {
     // network denotes the network object that contains the network of nodes
     public NetworkInterface network;
 
-    // deontes the object of the consistent hashing that is used in hash calculation
+    // denotes the object of the consistent hashing that is used in hash calculation
     public ConsistentHashing consistentHash;
 
-    public ChordProtocolSimulator(Protocol protocol, Network network, int m, int nodeCount, int keyCount){
+    public ChordProtocolSimulator(Protocol protocol, Network network, int m, int nodeCount, int keyCount) {
         this.keyIndexes = new LinkedHashMap<>();
         this.protocol = protocol;
         this.network = network;
@@ -61,31 +59,25 @@ public class ChordProtocolSimulator {
      * @param keyCount - number of keys that needs to be assigned to nodes
      * @return the chord protocol simulator object
      */
-    public static ChordProtocolSimulator getInstance(Network network, int m, int keyCount){
-
+    public static ChordProtocolSimulator getInstance(Network network, int m, int keyCount) {
         Protocol chordProtocol = new ChordProtocol(m);
         int nodeCount = network.getSize();
-        ChordProtocolSimulator chordProtocolSimulator = new ChordProtocolSimulator(chordProtocol, network, m, nodeCount,
-                keyCount);
-        return chordProtocolSimulator;
+        return new ChordProtocolSimulator(chordProtocol, network, m, nodeCount, keyCount);
     }
 
     /**
      * This method assign indexes of keys to nodes in the network.
-     *
-     *     First keys are generated randomly. Each key is assigned a key name and it's store in the keyIndexes. Then key
+     *     First keys are generated randomly. Each key is assigned a key name, and it's store in the keyIndexes. Then key
      *     indexes are added to the node.
-     *
+
      *     For each key index:
      *         1) find the node that should be responsible for the key (the index of the node should be greater than the
      *         index of key and the key index should be close to node index in the consistent hash ring)
      *         2) add the key index to the node (by calling the peer.add_data() from the network)
      */
-    public void assignKeys(){
-
+    public void assignKeys() {
         generateKeys();
-        for(Map.Entry<String, Integer> entry: keyIndexes.entrySet())
-        {
+        for (Map.Entry<String, Integer> entry: keyIndexes.entrySet()) {
 //            String keyName =  entry.getKey();
             int keyIndex =  entry.getValue();
             String peerName = findPeer(keyIndex);
@@ -101,11 +93,9 @@ public class ChordProtocolSimulator {
      *         consistentHashing.hash("key name") is used to calculate the index
      *         2) store the ("key name", "index") in the keyIndexes hash map
      */
-    public void generateKeys(){
-
-        for(int i=1;i<keyCount+1;i++)
-        {
-            String keyName =  "key "+i;
+    public void generateKeys() {
+        for (int i = 1; i < keyCount + 1; i++) {
+            String keyName =  "key " + i;
             int keyIndex = consistentHash.hash(keyName);
             this.keyIndexes.put(keyName, keyIndex);
         }
@@ -120,13 +110,12 @@ public class ChordProtocolSimulator {
      * @param key_index index of the key
      * @return the name of the node that should be responsible for the key
      */
-    public String findPeer(int key_index){
-
+    public String findPeer(int key_index) {
         List<Integer> sortedIndexes = new ArrayList<Integer>();
         int peerIndex = -1;
 
         // calculate the indexes of all the nodes using consistent hashing
-        for(Map.Entry<String, NodeInterface> node: this.network.getTopology().entrySet()) {
+        for (Map.Entry<String, NodeInterface> node: this.network.getTopology().entrySet()) {
             String nodeName = node.getValue().getName();
             int nodeIndex = consistentHash.hash(nodeName);
             sortedIndexes.add(nodeIndex);
@@ -137,15 +126,14 @@ public class ChordProtocolSimulator {
 
         // check if the key index is larger than the biggest node index
         // if it is larger than the key should be placed before the lowest node index (at the start of the ring)
-        if(key_index> sortedIndexes.get(sortedIndexes.size()-1)){
+        if (key_index> sortedIndexes.get(sortedIndexes.size()-1)){
             peerIndex = sortedIndexes.get(0);
-        }
-        else{
+        } else {
             // if the key index is not larger than the biggest node index, then choose the node that has index
             // bigger than the key index. loop through the nodes in the ascending order of the node indexes
-            for(int i=0;i < sortedIndexes.size(); i++){
-                if(sortedIndexes.get(i) >= key_index){
-                    peerIndex = sortedIndexes.get(i);
+            for (Integer sortedIndex : sortedIndexes) {
+                if (sortedIndex >= key_index) {
+                    peerIndex = sortedIndex;
                     break;
                 }
             }
@@ -168,16 +156,14 @@ public class ChordProtocolSimulator {
      * @param peerIndex index of the node
      * @return  name of the node
      */
-    public String findPeerName(int peerIndex){
-
+    public String findPeerName(int peerIndex) {
         int peerCount = nodeCount;
-        for(int i=1; i<peerCount+1; i++){
-            String name = "Node "+i;
+        for (int i = 1; i < peerCount + 1; i++) {
+            String name = "Node " + i;
             int index = consistentHash.hash(name);
-            if(peerIndex==index){
+            if (peerIndex==index) {
                 return name;
             }
-
         }
         return null;
     }
@@ -186,11 +172,9 @@ public class ChordProtocolSimulator {
      *  This method prints the network. The network consists of set of nodes. It prints different information contained
      *  in the node such as neighbors, routing table, data.
      */
-    public void printNetwork(){
-
+    public void printNetwork() {
         // gets the network from the protocol
         NetworkInterface network = protocol.getNetwork();
-
         // prints the topology
         network.printTopology();
     }
@@ -201,26 +185,26 @@ public class ChordProtocolSimulator {
      * neighbor, but I think the chord protocol doesn't make this restriction. but still even if  the node has multiple
      * neighbors this protocol should work.
      */
-    public void printRing(){
+    public void printRing() {
         NodeInterface head = null;
-        for(Map.Entry<String, NodeInterface> node: this.network.getTopology().entrySet()){
+        for (Map.Entry<String, NodeInterface> node: this.network.getTopology().entrySet()) {
             head = node.getValue();
             break;
         }
         System.out.println("........printing ring..............");
 
         // or assert not null?
-        if(head == null || head.getNeighbors().isEmpty()){
+        if (head == null || head.getNeighbors().isEmpty()) {
             return;
         }
 
         System.out.print(head.getName());
         NodeInterface next = head.getSuccessor();
-        while(true){
-            System.out.print(" --- "+next.getName());
-            next  = next.getSuccessor();
-            if(next.getName().equals(head.getName())){
-                System.out.print(" --- "+next.getName()+"\n");
+        while (true) {
+            System.out.print(" --- " + next.getName());
+            next = next.getSuccessor();
+            if (next.getName().equals(head.getName())) {
+                System.out.print(" --- "+next.getName() + "\n");
                 break;
             }
         }
@@ -232,31 +216,22 @@ public class ChordProtocolSimulator {
      * lookup from the chord protocol and returns the node index. It then compares the node index with the correct node
      * index (check response) is used for the comparison.
      */
-    public void testLookUp(){
-
-        for(Map.Entry<String, Integer> entry: keyIndexes.entrySet())
-        {
-
+    public void testLookUp() {
+        for (Map.Entry<String, Integer> entry: keyIndexes.entrySet()) {
             // lookup the key index
             LookUpResponse response = protocol.lookUp(entry.getValue());
 
-            if(response == null)
-            {
-                return;
-            }
+            if (response == null) return;
 
             System.out.println(response.toString());
             // check whether the returned node index is correct or not
-            if(checkResponse(entry.getValue(),response.node_name)){
-                System.out.println("lookup successful for "+entry.getKey());
-            }
-            else
-            {
-                System.out.println("lookup failed for "+entry.getKey());
+            if (checkResponse(entry.getValue(),response.node_name)) {
+                System.out.println("lookup successful for " + entry.getKey());
+            } else {
+                System.out.println("lookup failed for " + entry.getKey());
                 break;
             }
         }
-
     }
 
     /**
@@ -266,9 +241,9 @@ public class ChordProtocolSimulator {
      * @param peerName name of the node
      * @return true if the node stores the key index otherwise return false
      */
-    public boolean checkResponse(int keyIndex, String peerName){
+    public boolean checkResponse(int keyIndex, String peerName) {
         LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast
-        for(Integer data : dataItems){
+        for (Integer data : dataItems) {
             if(data==keyIndex){
                 return true;
             }
@@ -283,7 +258,7 @@ public class ChordProtocolSimulator {
     3) builds the finger table
      */
 
-    public void buildProtocol(){
+    public void buildProtocol() {
         protocol.setNetwork(network);
         assignKeys();
         protocol.setKeys(keyIndexes);
@@ -298,8 +273,7 @@ public class ChordProtocolSimulator {
      *     2) generate keys and assign it to nodes
      *     3) tests the lookup operation (only if necessary)
      */
-    public void start(){
-
+    public void start() {
         // builds the protocol
         buildProtocol();
 
@@ -314,5 +288,4 @@ public class ChordProtocolSimulator {
          */
         // Look up all the key, print out as required in the Assignment Description
     }
-
 }

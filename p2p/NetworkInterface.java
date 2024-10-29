@@ -3,11 +3,10 @@ package p2p;
 import java.util.LinkedHashMap;
 
 public interface NetworkInterface {
-
     /**
      *  returns the network object that consists of all the nodes
      *
-     * @return set of nodes (node name, node object)
+     * @return HashMap of nodes (node name, node object)
      */
     LinkedHashMap<String, NodeInterface> getTopology();
 
