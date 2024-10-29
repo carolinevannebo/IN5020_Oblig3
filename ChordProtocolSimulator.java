@@ -283,12 +283,12 @@ public class ChordProtocolSimulator {
     3) builds the finger table
      */
 
-    public void buildProtocol(){
+    public void buildProtocol(int m){
         protocol.setNetwork(network);
         assignKeys();
         protocol.setKeys(keyIndexes);
         protocol.buildOverlayNetwork();
-        protocol.buildFingerTable();
+        protocol.buildFingerTable(m);
     }
 
     /**
@@ -298,10 +298,10 @@ public class ChordProtocolSimulator {
      *     2) generate keys and assign it to nodes
      *     3) tests the lookup operation (only if necessary)
      */
-    public void start(){
+    public void start(int m){
 
         // builds the protocol
-        buildProtocol();
+        buildProtocol(m);
 
         printRing();
         printNetwork();

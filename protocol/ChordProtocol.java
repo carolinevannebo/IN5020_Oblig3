@@ -2,6 +2,9 @@ package protocol;
 
 
 import crypto.ConsistentHashing;
+import fingertable.FingerTable;
+import fingertable.FingerTableEntry;
+import fingertable.Interval;
 import p2p.NetworkInterface;
 import p2p.NodeInterface;
 
@@ -112,14 +115,51 @@ public class ChordProtocol implements Protocol{
      * lookup operations. The finger table stores m-entries. Each ith entry points to the ith finger of the node.
      * Each ith entry stores the information of it's neighbor that is responsible for indexes ((n+2^i-1) mod 2^m).
      * i = 1,...,m.
-     *
+
      *Each finger table entry should consists of
      *     1) start value - (n+2^i-1) mod 2^m. i = 1,...,m
-     *     2) interval - [finger[i].start, finger[i+1].start)
+     *     2) interval - [finger[i].start, finger[i+1].start]
      *     3) node - first node in the ring that is responsible for indexes in the interval
      */
-    public void buildFingerTable() {
+    public void buildFingerTable(int m) {
+        // todo: should m be stored in config or something instead of params?
+        // get sorted list of nodes
+        List<NodeInterface> nodes = new ArrayList<>(network.getTopology().values());
+        nodes.sort(Comparator.comparingInt(NodeInterface::getId));
 
+        // build finger table
+        for (NodeInterface node : nodes) {
+            int nodeId = node.getId();
+            FingerTable fingerTable = new FingerTable(m);
+
+            for (int i = 1; i <= m; i++) {
+                // calculate starting value for entry
+                int start = (nodeId + (1 << (i - 1))) % (1 << m);
+
+                // find successor node for starting value
+                NodeInterface successor = findSuccessor(start, nodes);
+
+                // calculate interval
+                int nextStart = (nodeId + (1 << i) - 1) % (1 << m);
+                Interval interval = new Interval(start, nextStart);
+
+                // add entry to finger table
+                fingerTable.addEntry(new FingerTableEntry(start, interval, successor));
+            }
+
+            // set finger table for this node
+            node.setRoutingTable(fingerTable);
+        }
+    }
+
+    private NodeInterface findSuccessor(int id, List<NodeInterface> nodes) {
+        for (NodeInterface node : nodes) {
+            if (node.getId() >= id) {
+                return node;
+            }
+        }
+        // if no node has higher id than the seeked id, return the first node (wrap around the ring)
+        return nodes.get(0);
     }
 
     /**

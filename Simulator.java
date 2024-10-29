@@ -82,7 +82,7 @@ public class Simulator{
         ChordProtocolSimulator chordProtocolSimulator = ChordProtocolSimulator.getInstance(myNetwork, m, keyCount);
 
         // stars the chord protocol
-        chordProtocolSimulator.start();
+        chordProtocolSimulator.start(m);
     }
 
     /**

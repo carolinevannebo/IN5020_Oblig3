@@ -47,7 +47,7 @@ public interface Protocol {
      *     2) interval - [finger[i].start, finger[i+1].start)
      *     3) node - first node in the ring that is responsible for indexes in the interval
      */
-    public void buildFingerTable();
+    public void buildFingerTable(int m);
 
     /**
      * This method performs the lookup operation.
