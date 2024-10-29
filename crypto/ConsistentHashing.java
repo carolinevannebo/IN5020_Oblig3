@@ -30,8 +30,6 @@ public class ConsistentHashing {
     }
 
     /*
-
-
     @param data
     @return returns
      */
@@ -42,8 +40,6 @@ public class ConsistentHashing {
      * @return hash value (the integer value from 0 to 2^m that indicates the placement of data in the ring).
      */
     public int hash(String data){
-
-
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
@@ -57,7 +53,6 @@ public class ConsistentHashing {
         // Convert byte array into signum representation
         BigInteger res = new BigInteger(1, messageDigest);
 
-
         // consistent hashing function - hash mod 2^m
         BigInteger length = BigInteger.valueOf((long) Math.pow(2, m));
         res = res.mod(length);
@@ -65,8 +60,6 @@ public class ConsistentHashing {
         return res.intValue();
 
     }
-
-
 
     public static void test1(){
         ConsistentHashing ch = new ConsistentHashing(3);
@@ -93,7 +86,4 @@ public class ConsistentHashing {
         System.out.println(res);
         System.out.println(set.size());
     }
-
-
-
 }

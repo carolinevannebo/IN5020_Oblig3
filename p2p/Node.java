@@ -14,7 +14,6 @@ import java.util.LinkedHashSet;
  * table and data.
  */
 public class Node implements NodeInterface{
-
     // name of the node
     public String name;
 
@@ -30,7 +29,6 @@ public class Node implements NodeInterface{
     // this data can store set of objects. For example, key indexes used in the chord protocol can be stored here
     public LinkedHashSet<Object> data;
 
-
     public Node(String name) {
         this.id = -1;
         this.name = name;
@@ -38,12 +36,9 @@ public class Node implements NodeInterface{
         this.neighbors= new HashMap<String, NodeInterface>();
     }
 
-
-
     public String getName() {
         return this.name;
     }
-
 
     public void setId(int id){
         this.id = id;
@@ -53,11 +48,9 @@ public class Node implements NodeInterface{
         return this.id;
     }
 
-
     public Object getData() {
         return this.data;
     }
-
 
     public void addData(Object data) {
         this.data.add(data);
@@ -67,26 +60,21 @@ public class Node implements NodeInterface{
         this.data.remove(data);
     }
 
-
     public Collection<NodeInterface> getNeighbors(){
         return  this.neighbors.values();
     }
-
 
     public NodeInterface getNeighbor(String name){
         return this.neighbors.get(name);
     }
 
-
     public void addNeighbor(String name, NodeInterface node){
         this.neighbors.put(name, node);
     }
 
-
     public void removeNeighbor(String name){
         this.neighbors.remove(name);
     }
-
 
     public void setRoutingTable(Object obj){
         this.routingTable =obj;
@@ -96,11 +84,9 @@ public class Node implements NodeInterface{
         return this.routingTable;
     }
 
-
     public NodeInterface getSuccessor(){
         return this.neighbors.entrySet().iterator().next().getValue();
     }
-
 
     public void print(){
         System.out.print("Node : "+ this.getName());

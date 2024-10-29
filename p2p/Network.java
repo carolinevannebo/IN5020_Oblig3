@@ -20,26 +20,21 @@ public class Network implements NetworkInterface{
         this.network = new LinkedHashMap<String, NodeInterface>();
     }
 
-
     public LinkedHashMap<String, NodeInterface> getTopology(){
         return this.network;
     }
-
 
     public NodeInterface getNode(String name){
         return this.network.get(name);
     }
 
-
     public void addNode(String name, NodeInterface node){
         this.network.put(name, node);
     }
 
-
     public void removeNode(String name){
         this.network.remove(name);
     }
-
 
     public void printTopology(){
         System.out.println("..............Printing network topology..............");
@@ -49,7 +44,6 @@ public class Network implements NetworkInterface{
         }
         System.out.println("......................................................");
     }
-
 
     /**
      * This method creates instance of the network class and returns it
@@ -67,10 +61,7 @@ public class Network implements NetworkInterface{
         return network;
     }
 
-
-
     public int getSize(){
         return this.network.size();
     }
-
 }

@@ -14,8 +14,6 @@ import java.util.*;
  * This class simulates the chord protocol.
  */
 public class ChordProtocolSimulator {
-
-
     // constants
     // length of the identifier used in consistent hasing
     public int m;
@@ -37,8 +35,6 @@ public class ChordProtocolSimulator {
     // deontes the object of the consistent hashing that is used in hash calculation
     public ConsistentHashing consistentHash;
 
-
-
     public ChordProtocolSimulator(Protocol protocol, Network network, int m, int nodeCount, int keyCount){
         this.keyIndexes = new LinkedHashMap<>();
         this.protocol = protocol;
@@ -54,7 +50,7 @@ public class ChordProtocolSimulator {
 
     @param protocol - it is the object of the protocol (eg:- chord protocol)
     @param network - it is the object of the network of nodes
-    @return - retuns the object of the chord protocol simulator class
+    @return - returns the object of the chord protocol simulator class
      */
 
     /**
@@ -73,8 +69,6 @@ public class ChordProtocolSimulator {
                 keyCount);
         return chordProtocolSimulator;
     }
-
-
 
     /**
      * This method assign indexes of keys to nodes in the network.
@@ -100,8 +94,6 @@ public class ChordProtocolSimulator {
         }
     }
 
-
-
     /**
      * This method generates 'KeyCount' number of keys. each key has name "key"+i i=1...KeyCount
      *     For each key:
@@ -109,7 +101,7 @@ public class ChordProtocolSimulator {
      *         consistentHashing.hash("key name") is used to calculate the index
      *         2) store the ("key name", "index") in the keyIndexes hash map
      */
-    public  void generateKeys(){
+    public void generateKeys(){
 
         for(int i=1;i<keyCount+1;i++)
         {
@@ -118,8 +110,6 @@ public class ChordProtocolSimulator {
             this.keyIndexes.put(keyName, keyIndex);
         }
     }
-
-
 
     /**
      * This method finds peer that should be responsible for a given key.
@@ -135,7 +125,7 @@ public class ChordProtocolSimulator {
         List<Integer> sortedIndexes = new ArrayList<Integer>();
         int peerIndex = -1;
 
-        // calculate the indexes of all the nodes using consistent hasing
+        // calculate the indexes of all the nodes using consistent hashing
         for(Map.Entry<String, NodeInterface> node: this.network.getTopology().entrySet()) {
             String nodeName = node.getValue().getName();
             int nodeIndex = consistentHash.hash(nodeName);
@@ -146,7 +136,7 @@ public class ChordProtocolSimulator {
         Collections.sort(sortedIndexes);
 
         // check if the key index is larger than the biggest node index
-        // if it is larger then the key should be placed before the lowest node index (at the start of the ring)
+        // if it is larger than the key should be placed before the lowest node index (at the start of the ring)
         if(key_index> sortedIndexes.get(sortedIndexes.size()-1)){
             peerIndex = sortedIndexes.get(0);
         }
@@ -169,7 +159,6 @@ public class ChordProtocolSimulator {
         return findPeerName(peerIndex);
     }
 
-
     /**
      * This method returns the peer name based on the peer index
      * This method uses a hack that the network setup uses the names Peer 1, Peer 2,... etc. It would be nice if this is
@@ -180,7 +169,6 @@ public class ChordProtocolSimulator {
      * @return  name of the node
      */
     public String findPeerName(int peerIndex){
-
 
         int peerCount = nodeCount;
         for(int i=1; i<peerCount+1; i++){
@@ -194,8 +182,6 @@ public class ChordProtocolSimulator {
         return null;
     }
 
-
-
     /**
      *  This method prints the network. The network consists of set of nodes. It prints different information contained
      *  in the node such as neighbors, routing table, data.
@@ -205,15 +191,14 @@ public class ChordProtocolSimulator {
         // gets the network from the protocol
         NetworkInterface network = protocol.getNetwork();
 
-        // prints the top0logy
+        // prints the topology
         network.printTopology();
     }
-
 
     /**
      * This method prints the ring overlay that chord protocol uses. It follows circular linked list algorithm to travel
      * the network. It starts with head and goes through successors. I am assuming that each peer stores only one
-     * neighbor but i think the chord protocol doesn't make this restriction. but still even if  the node has multiple
+     * neighbor, but I think the chord protocol doesn't make this restriction. but still even if  the node has multiple
      * neighbors this protocol should work.
      */
     public void printRing(){
@@ -224,7 +209,8 @@ public class ChordProtocolSimulator {
         }
         System.out.println("........printing ring..............");
 
-        if(head.getNeighbors().size()==0){
+        // or assert not null?
+        if(head == null || head.getNeighbors().isEmpty()){
             return;
         }
 
@@ -240,8 +226,6 @@ public class ChordProtocolSimulator {
         }
         System.out.println(".....................................");
     }
-
-
 
     /**
      * This method tests the functioning of the lookup. This is a simple evaluation. For each key index it calls the
@@ -275,7 +259,6 @@ public class ChordProtocolSimulator {
 
     }
 
-
     /**
      * This method compares whether the node actually stores the given key index or not
      *  It retrieves the data items stored at the particular node and compares whether the key index is stored or not
@@ -284,7 +267,7 @@ public class ChordProtocolSimulator {
      * @return true if the node stores the key index otherwise return false
      */
     public boolean checkResponse(int keyIndex, String peerName){
-        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData();
+        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast
         for(Integer data : dataItems){
             if(data==keyIndex){
                 return true;
@@ -292,8 +275,6 @@ public class ChordProtocolSimulator {
         }
         return false;
     }
-
-
 
     /**
      * This method builds the chord protocol.
@@ -315,7 +296,7 @@ public class ChordProtocolSimulator {
      * This method starts the simulation.
      *     1) builds the chord protocol
      *     2) generate keys and assign it to nodes
-     *     3) tests the look up operation (only if necessary)
+     *     3) tests the lookup operation (only if necessary)
      */
     public void start(){
 
@@ -326,7 +307,7 @@ public class ChordProtocolSimulator {
         printNetwork();
 
         // tests the lookup operation
-        //testLookUp();
+        testLookUp();
 
         /*
         implement this logic

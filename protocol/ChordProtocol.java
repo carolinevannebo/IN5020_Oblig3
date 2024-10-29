@@ -31,16 +31,12 @@ public class ChordProtocol implements Protocol{
         this.keyIndexes = new HashMap<String, Integer>();
     }
 
-
-
     /**
      * sets the hash function
      */
     public void setHashFunction(){
         this.ch = new ConsistentHashing(this.m);
     }
-
-  
 
     /**
      * sets the network
@@ -50,7 +46,6 @@ public class ChordProtocol implements Protocol{
         this.network = network;
     }
 
-
     /**
      * sets the key indexes. Those key indexes can be used to  test the lookup operation.
      * @param keyIndexes - indexes of keys
@@ -59,8 +54,6 @@ public class ChordProtocol implements Protocol{
         this.keyIndexes = keyIndexes;
     }
 
-
-
     /**
      *
      * @return the network object
@@ -68,11 +61,6 @@ public class ChordProtocol implements Protocol{
     public NetworkInterface getNetwork(){
         return this.network;
     }
-
-
-
-
-
 
     /**
      * This method builds the overlay network.  It assumes the network object has already been set. It generates indexes
@@ -83,17 +71,10 @@ public class ChordProtocol implements Protocol{
      *           3)     add neighbor to the peer (uses Peer.addNeighbor() method)
      */
     public void buildOverlayNetwork(){
-
         /*
         implement this logic
          */
-
     }
-
-
-
-
-
 
     /**
      * This method builds the finger table. The finger table is the routing table used in the chord protocol to perform
@@ -110,10 +91,7 @@ public class ChordProtocol implements Protocol{
         /*
         implement this logic
          */
-
     }
-
-
 
     /**
      * This method performs the lookup operation.
@@ -130,7 +108,4 @@ public class ChordProtocol implements Protocol{
          */
         return null;
     }
-
-
-
 }

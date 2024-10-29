@@ -4,8 +4,6 @@ import java.util.LinkedHashMap;
 
 public interface NetworkInterface {
 
-
-
     /**
      *  returns the network object that consists of all the nodes
      *
