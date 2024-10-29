@@ -213,6 +213,6 @@ names of the nodes that have seen this look up operation.
    - node count = 100, m = 20
    - node count = 1000, m = 20
 2. For each configuration, **the corresponding output files should be generated.** Each
-   output file should contain the output for each key (as specified in the look up section).
+   output file should contain the output for each key (as specified in the lookup section).
 3. For each configuration, calculate the average hop count and add it at the end of the
    corresponding output file. (eg:- average hop count = 5)

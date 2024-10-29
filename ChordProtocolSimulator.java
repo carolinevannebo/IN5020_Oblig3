@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class ChordProtocolSimulator {
     // constants
-    // length of the identifier used in consistent hasing
+    // length of the identifier used in consistent hashing
     public int m;
     // number of nodes in the network
     public int nodeCount;
@@ -283,12 +283,12 @@ public class ChordProtocolSimulator {
     3) builds the finger table
      */
 
-    public void buildProtocol(int m){
+    public void buildProtocol(){
         protocol.setNetwork(network);
         assignKeys();
         protocol.setKeys(keyIndexes);
         protocol.buildOverlayNetwork();
-        protocol.buildFingerTable(m);
+        protocol.buildFingerTable();
     }
 
     /**
@@ -298,10 +298,10 @@ public class ChordProtocolSimulator {
      *     2) generate keys and assign it to nodes
      *     3) tests the lookup operation (only if necessary)
      */
-    public void start(int m){
+    public void start(){
 
         // builds the protocol
-        buildProtocol(m);
+        buildProtocol();
 
         printRing();
         printNetwork();

@@ -116,14 +116,12 @@ public class ChordProtocol implements Protocol{
      * Each ith entry stores the information of it's neighbor that is responsible for indexes ((n+2^i-1) mod 2^m).
      * i = 1,...,m.
 
-     *Each finger table entry should consists of
+     * Each finger table entry should consists of
      *     1) start value - (n+2^i-1) mod 2^m. i = 1,...,m
      *     2) interval - [finger[i].start, finger[i+1].start]
      *     3) node - first node in the ring that is responsible for indexes in the interval
      */
-    public void buildFingerTable(int m) {
-        // todo: should m be stored in config or something instead of params?
-        // get sorted list of nodes
+    public void buildFingerTable() {
         List<NodeInterface> nodes = new ArrayList<>(network.getTopology().values());
         nodes.sort(Comparator.comparingInt(NodeInterface::getId));
 
@@ -139,15 +137,16 @@ public class ChordProtocol implements Protocol{
                 // find successor node for starting value
                 NodeInterface successor = findSuccessor(start, nodes);
 
-                // calculate interval
-                int nextStart = (nodeId + (1 << i) - 1) % (1 << m);
+                // calculate interval: (start, nextStart)
+                // handle wrap-around case for the last entry
+                int nextStart = (start + (i << (i - 1))) % (1 << m);
                 Interval interval = new Interval(start, nextStart);
 
                 // add entry to finger table
                 fingerTable.addEntry(new FingerTableEntry(start, interval, successor));
             }
 
-            // set finger table for this node
+            // set finger table for current node
             node.setRoutingTable(fingerTable);
         }
     }
@@ -166,7 +165,7 @@ public class ChordProtocol implements Protocol{
      * This method performs the lookup operation.
      *  Given the key index, it starts with one of the node in the network and follows through the finger table.
      *  The correct successors would be identified and the request would be checked in their finger tables successively.
-     *   Finally, the request will reach the node that contains the data item.
+     *  Finally, the request will reach the node that contains the data item.
      *
      * @param keyIndex index of the key
      * @return names of nodes that have been searched and the final node that contains the key

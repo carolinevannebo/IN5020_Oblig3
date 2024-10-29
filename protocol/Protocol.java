@@ -44,10 +44,10 @@ public interface Protocol {
      *
      *Each finger table entry should consists of
      *     1) start value - (n+2^i-1) mod 2^m. i = 1,...,m
-     *     2) interval - [finger[i].start, finger[i+1].start)
+     *     2) interval - [finger[i].start, finger[i+1].start]
      *     3) node - first node in the ring that is responsible for indexes in the interval
      */
-    public void buildFingerTable(int m);
+    public void buildFingerTable();
 
     /**
      * This method performs the lookup operation.
