@@ -179,26 +179,79 @@ public class ChordProtocol implements Protocol {
         LinkedHashSet<String> route = new LinkedHashSet<>();
         route.add(currentNode.getName());
 
+        System.out.println("Looking up key " + keyIndex);
+        System.out.println("Starting node: " + currentNode.getName() + " with ID: " + currentNode.getId());
+
         while (true) {
-            if (currentNode.getId() >= keyIndex || (currentNode.getId() < keyIndex && keyIndex < 0 )) { // check if current node contains key
+            System.out.println("Checking node: " + currentNode.getName() + " with ID: " + currentNode.getId());
+
+            // check if current node or its successor contains the key
+            if (isResponsibleForKey(currentNode, keyIndex)) {
+                System.out.println("Found key at node: " + currentNode.getName());
                 return new LookUpResponse(route, hopCount, currentNode.getName() + ": " + currentNode.getId());
             }
 
+//            if ((currentNode.getId() <= keyIndex && keyIndex < currentNode.getSuccessor().getId()) ||
+//                    (currentNode.getId() > currentNode.getSuccessor().getId() && (keyIndex >= currentNode.getId() ||
+//                            keyIndex < currentNode.getSuccessor().getId()))
+//            ) { // check if current node contains key
+//                System.out.println("Found key at node: " + currentNode.getName());
+//                return new LookUpResponse(route, hopCount, currentNode.getName() + ": " + currentNode.getId());
+//            }
+
+            // traverse finger table to find next appropriate node
             FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
-            NodeInterface nextNode = findSuccessor(fingerTable, keyIndex);
+            NodeInterface nextNode = findClosestPrecedingNode(fingerTable, keyIndex);
+
+            // check if lookup wraps around to start of ring
+            if (nextNode == null || nextNode.equals(currentNode)) {
+                System.out.println("Key wraps around; returning first node in ring.");
+                nextNode = network.getTopology().values().iterator().next();
+            }
+
+            System.out.println("Moving to next node: " + nextNode.getName() + " with ID: " + nextNode.getId());
             route.add(nextNode.getName());
             hopCount++;
             currentNode = nextNode;
         }
     }
 
-    private NodeInterface findSuccessor(FingerTable fingerTable, int keyIndex) {
+    private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
+        NodeInterface successor = node.getSuccessor();
+        int nodeId = node.getId();
+        int successorId = successor.getId();
+
+        // standard check within range of current node and successor
+        return (nodeId <= keyIndex && keyIndex < successorId) ||
+                (nodeId > successorId && (keyIndex >= nodeId || keyIndex < successorId));
+    }
+
+    private NodeInterface findClosestPrecedingNode(FingerTable fingerTable, int keyIndex) {
         for (FingerTableEntry entry : fingerTable.getEntries()) {
             Interval interval = entry.interval();
             if (interval.contains(keyIndex)) {
-                return entry.node();//.getSuccessor();
+                return entry.node();
             }
         }
-        return fingerTable.getEntries().get(fingerTable.getEntries().size() - 1).node();//.getSuccessor();
+        // return closest node in finger table if exact match is not found
+        if (!fingerTable.getEntries().isEmpty()) {
+            return fingerTable.getEntries().get(fingerTable.getEntries().size() - 1).node();
+        }
+        return null;
     }
+
+//    private NodeInterface findSuccessor(FingerTable fingerTable, int keyIndex) {
+//        for (FingerTableEntry entry : fingerTable.getEntries()) {
+//            Interval interval = entry.interval();
+//            if (interval.contains(keyIndex)) {
+//                return entry.node();//.getSuccessor();
+//            }
+//        }
+//        if (!fingerTable.getEntries().isEmpty()) {
+//            NodeInterface closestNode = fingerTable.getEntries().get(fingerTable.getEntries().size() - 1).node();
+//            System.out.println("Defaulting to closest preceding node: " + closestNode.getName());
+//            return closestNode;
+//        }
+//        return null; // or throw an error if this case should never occur
+//    }
 }
