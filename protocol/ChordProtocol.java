@@ -70,16 +70,16 @@ public class ChordProtocol implements Protocol {
      *           1) for each node:
      *           2)     find neighbor based on consistent hash (neighbor should be next to the current node in the ring)
      *           3)     add neighbor to the peer (uses Peer.addNeighbor() method)
+
+     * 1. initialize: for each node in topology, generate a hash-value using consistent hashing and set the node index
+     * 2. sort: sort nodes by id to ensure ring topology
+     * 3. update topology: clear LinkedHashMap and repopulate it with sorted nodes to maintain order
+     * 4. add neighbor: to maintain ring, loop through sorted nodes,
+     *    for each node find the next
+     *    using modulo to ensure that the ring "wraps around",
+     *    ie that the last node connects back to the first node
      */
     public void buildOverlayNetwork() {
-        /** 1. initialize: for each node in topology, generate a hash-value using consistent hashing and set the node index
-         *  2. sort: sort nodes by id to ensure ring topology
-         *  3. update topology: clear LinkedHashMap and repopulate it with sorted nodes to maintain order
-         *  4. add neighbor: to maintain ring, loop through sorted nodes,
-         *      for each node find the next
-         *      using modulo to ensure that the ring "wraps around",
-         *      ie that the last node connects back to the first node
-         */
         LinkedHashMap<String, NodeInterface> topology = network.getTopology();
         for (Map.Entry<String, NodeInterface> entry : topology.entrySet()) {
             String nodeName = entry.getKey();
@@ -163,14 +163,42 @@ public class ChordProtocol implements Protocol {
      *  Given the key index, it starts with one of the node in the network and follows through the finger table.
      *  The correct successors would be identified and the request would be checked in their finger tables successively.
      *  Finally, the request will reach the node that contains the data item.
-     *
+
+     *  1. start from a single chosen node for all lookups.
+     *  2. check if the current node holds the key.
+     *  3. if not, select the next node by consulting the finger table.
+     *  4. continue until the responsible node is found,
+     *      keeping track of each node visited (for hop count and route).
+
      * @param keyIndex index of the key
      * @return names of nodes that have been searched and the final node that contains the key
      */
     public LookUpResponse lookUp(int keyIndex) {
-        /*
-        implement this logic
-         */
-        return null;
+        NodeInterface currentNode = network.getTopology().values().iterator().next();
+        int hopCount = 0;
+        LinkedHashSet<String> route = new LinkedHashSet<>();
+        route.add(currentNode.getName());
+
+        while (true) {
+            if (currentNode.getId() >= keyIndex || (currentNode.getId() < keyIndex && keyIndex < 0 )) { // check if current node contains key
+                return new LookUpResponse(route, hopCount, currentNode.getName() + ": " + currentNode.getId());
+            }
+
+            FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
+            NodeInterface nextNode = findSuccessor(fingerTable, keyIndex);
+            route.add(nextNode.getName());
+            hopCount++;
+            currentNode = nextNode;
+        }
+    }
+
+    private NodeInterface findSuccessor(FingerTable fingerTable, int keyIndex) {
+        for (FingerTableEntry entry : fingerTable.getEntries()) {
+            Interval interval = entry.interval();
+            if (interval.contains(keyIndex)) {
+                return entry.node();//.getSuccessor();
+            }
+        }
+        return fingerTable.getEntries().get(fingerTable.getEntries().size() - 1).node();//.getSuccessor();
     }
 }

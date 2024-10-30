@@ -221,11 +221,14 @@ public class ChordProtocolSimulator {
             // lookup the key index
             LookUpResponse response = protocol.lookUp(entry.getValue());
 
-            if (response == null) return;
+            if (response == null) {
+                System.out.println("Key " + entry.getKey() + " not found");
+                return;
+            }
 
             System.out.println(response.toString());
             // check whether the returned node index is correct or not
-            if (checkResponse(entry.getValue(),response.node_name)) {
+            if (checkResponse(entry.getValue(), response.node_name)) {
                 System.out.println("lookup successful for " + entry.getKey());
             } else {
                 System.out.println("lookup failed for " + entry.getKey());
@@ -242,9 +245,15 @@ public class ChordProtocolSimulator {
      * @return true if the node stores the key index otherwise return false
      */
     public boolean checkResponse(int keyIndex, String peerName) {
+        NodeInterface node = this.network.getTopology().get(peerName);
+        if (node == null) {
+            System.err.println("Node " + peerName + " not found");
+            return false;
+        }
+
         LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast
         for (Integer data : dataItems) {
-            if(data==keyIndex){
+            if (data == keyIndex) {
                 return true;
             }
         }
@@ -276,7 +285,6 @@ public class ChordProtocolSimulator {
     public void start() {
         // builds the protocol
         buildProtocol();
-
         printRing();
         printNetwork();
 

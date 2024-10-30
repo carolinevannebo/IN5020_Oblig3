@@ -49,7 +49,7 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 |---------------------|--------|
 | buildOverlayNetwork | item   |
 | buildFingerTable    | item   |
-| item                | item   |
+| lookUp              | item   |
 
 **Not implemented yet:**
 - ChordProtocolSimulator.java
@@ -58,7 +58,7 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 - ChordProtocol.java
   - [x] `buildOverlayNetwork()`
   - [x] `buildFingerTable()`
-  - [ ] `lookUp(int keyIndex)`
+  - [x] `lookUp(int keyIndex)`
 - Node.java
   - [ ] `print()`
   - [ ] `removeNeighbor(String name)`
