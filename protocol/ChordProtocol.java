@@ -105,6 +105,13 @@ public class ChordProtocol implements Protocol {
             NodeInterface currentNode = sortedNodes.get(i).getValue();
             NodeInterface nextNode = sortedNodes.get((i + 1) % nodeCount).getValue(); // ensure ring topology by wrapping around
             currentNode.addNeighbor(nextNode.getName(), nextNode);
+
+            // just testing, delete later
+            if (currentNode.getSuccessor() == nextNode) {
+                System.out.println("successor set correctly");
+            } else {
+                System.out.println("successor not set correctly");
+            }
         }
     }
 
@@ -187,17 +194,14 @@ public class ChordProtocol implements Protocol {
             // check if current node or its successor contains the key
             if (isResponsibleForKey(currentNode, keyIndex)) {
                 System.out.println("Found key at node: " + currentNode.getName());
-                return new LookUpResponse(route, hopCount, currentNode.getName() + ": " + currentNode.getId());
+                //return new LookUpResponse(route, hopCount, currentNode.getName() + ": " + currentNode.getId());
+                return new LookUpResponse(route, keyIndex, currentNode.getName());
             }
 
             // traverse finger table to find next appropriate node
             FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
             NodeInterface nextNode = findClosestPrecedingNode(fingerTable, keyIndex, currentNode);
 
-//            if (nextNode.equals(currentNode)) {
-//                System.out.println("Lookup is stuck at node: " + currentNode.getName());
-//                break;
-//            }
             // check if lookup wraps around to start of ring
             if (nextNode == null || nextNode.equals(currentNode)) {
                 System.out.println("Key wraps around; returning first node in ring.");
@@ -229,7 +233,7 @@ public class ChordProtocol implements Protocol {
         for (int i = fingerTable.getEntries().size() - 1; i >= 0; i--) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
             int nodeId = entry.node().getId();
-            if (nodeId > currentNode.getId() && nodeId < keyIndex) {
+            if (nodeId >= currentNode.getId() && nodeId < keyIndex) {
                 // ensure next node is not current node
                 if (!entry.node().equals(currentNode)) {
                     return entry.node();

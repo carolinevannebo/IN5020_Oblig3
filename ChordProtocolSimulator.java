@@ -228,7 +228,7 @@ public class ChordProtocolSimulator {
 
             System.out.println(response.toString());
             // check whether the returned node index is correct or not
-            if (checkResponse(entry.getValue(), response.node_name)) {
+            if (checkResponse(entry.getValue(), response.node_name)) { // lookup fails here
                 System.out.println("lookup successful for " + entry.getKey());
             } else {
                 System.out.println("lookup failed for " + entry.getKey());
@@ -245,15 +245,15 @@ public class ChordProtocolSimulator {
      * @return true if the node stores the key index otherwise return false
      */
     public boolean checkResponse(int keyIndex, String peerName) {
-        NodeInterface node = this.network.getTopology().get(peerName);
+        NodeInterface node = this.network.getTopology().get(peerName); // peerName: "Node 5" network: Network@938
         if (node == null) {
             System.err.println("Node " + peerName + " not found");
             return false;
         }
 
-        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast
+        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast data should be 932 but returns 669
         for (Integer data : dataItems) {
-            if (data == keyIndex) {
+            if (data == keyIndex) { // keyIndex: 932 data: 669
                 return true;
             }
         }
