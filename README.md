@@ -58,7 +58,7 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 - ChordProtocol.java
   - [x] `buildOverlayNetwork()`
   - [x] `buildFingerTable()`
-  - [x] `lookUp(int keyIndex)`
+  - [ ] `lookUp(int keyIndex)`
 - Node.java
   - [ ] `print()`
   - [ ] `removeNeighbor(String name)`
