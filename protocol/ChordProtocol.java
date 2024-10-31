@@ -215,7 +215,9 @@ public class ChordProtocol implements Protocol {
             System.out.println("Checking node: " + currentNode.getName() + " with ID: " + currentNode.getId());
 
             // check if current node or its successor contains the key
-            if (isResponsibleForKey(currentNode, keyIndex)) {
+            if (isResponsibleForKey(currentNode, keyIndex) ||
+                    (currentNode.getSuccessor() != null && isResponsibleForKey(currentNode.getSuccessor(), keyIndex))
+            ) {
                 // todo: refactor into helper method
                 System.out.println("Checking current " + currentNode.getName() + " for keyIndex " + keyIndex + " with data: " + currentNode.getData().toString());
                 LookUpResponse currentNodeResponse = new LookUpResponse(route, keyIndex, currentNode.getName());
