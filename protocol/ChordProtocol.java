@@ -215,27 +215,14 @@ public class ChordProtocol implements Protocol {
             System.out.println("Checking node: " + currentNode.getName() + " with ID: " + currentNode.getId());
 
             // check if current node or its successor contains the key
-            if (isResponsibleForKey(currentNode, keyIndex) ||
-                    (currentNode.getSuccessor() != null && isResponsibleForKey(currentNode.getSuccessor(), keyIndex))
-            ) {
-                // todo: refactor into helper method
+            if (isResponsibleForKey(currentNode, keyIndex)) {
                 System.out.println("Checking current " + currentNode.getName() + " for keyIndex " + keyIndex + " with data: " + currentNode.getData().toString());
-                LookUpResponse currentNodeResponse = new LookUpResponse(route, keyIndex, currentNode.getName());
-                LinkedHashSet<Integer> currentDataItems = (LinkedHashSet<Integer>) currentNode.getData();
-                for (Integer data : currentDataItems) {
-                    if (data == keyIndex) {
-                        return currentNodeResponse;
-                    }
+                LookUpResponse response = getResponseForNode(route, keyIndex, currentNode);
+                if (response == null) {
+                    System.out.println("Checking successor " + currentNode.getSuccessor().getName() + " for keyIndex " + keyIndex + " with data: " + currentNode.getSuccessor().getData().toString());
+                    response = getResponseForNode(route, keyIndex, currentNode.getSuccessor());
                 }
-
-                System.out.println("Checking successor " + currentNode.getSuccessor().getName() + " for keyIndex " + keyIndex + " with data: " + currentNode.getSuccessor().getData().toString());
-                LookUpResponse successorNodeResponse = new LookUpResponse(route, keyIndex, currentNode.getSuccessor().getName());
-                LinkedHashSet<Integer> successorDataItems = (LinkedHashSet<Integer>) currentNode.getSuccessor().getData();
-                for (Integer data : successorDataItems) {
-                    if (data == keyIndex) {
-                        return successorNodeResponse;
-                    }
-                }
+                return response;
             }
 
             // traverse finger table to find next appropriate node
@@ -253,6 +240,17 @@ public class ChordProtocol implements Protocol {
             hopCount++;
             currentNode = nextNode;
         }
+    }
+
+    private LookUpResponse getResponseForNode(LinkedHashSet<String> route, int keyIndex, NodeInterface node) {
+        LookUpResponse response = new LookUpResponse(route, keyIndex, node.getName());
+        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) node.getData();
+        for (Integer data : dataItems) {
+            if (data == keyIndex) {
+                return response;
+            }
+        }
+        return null;
     }
 
 
