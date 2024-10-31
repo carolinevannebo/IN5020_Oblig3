@@ -83,7 +83,6 @@ public class ChordProtocol implements Protocol {
         LinkedHashMap<String, NodeInterface> topology = this.network.getTopology();
 
         for (Map.Entry<String, NodeInterface> entry : topology.entrySet()) {
-            System.out.println("At node " + entry.getKey() + " with data " + entry.getValue().getData());
             String nodeName = entry.getKey();
             int nodeIndex = ch.hash(nodeName); // consistent hashing
             NodeInterface node = entry.getValue();
@@ -110,17 +109,13 @@ public class ChordProtocol implements Protocol {
             // assign data to nodes - new
             for (Map.Entry<String, Integer> entry : keyIndexes.entrySet()) {
                 int keyIndex = entry.getValue();
-                // find node responsible for key
 
-                //if (!currentNode.getData().equals(keyIndex)) {
-                    NodeInterface responsibleNode = findSuccessorNode(keyIndex, sortedNodes);
-                    if (responsibleNode != null) {
-                        responsibleNode.addData(keyIndex);
-                        System.out.println("Assigned keyIndex " + keyIndex + " to node: " + responsibleNode.getName());
-                    } else {
-                        System.out.println("Responsible node not found for keyIndex " + keyIndex);
-                    }
-                //}
+                // find node responsible for key
+                NodeInterface responsibleNode = findSuccessorNode(keyIndex, sortedNodes);
+                if (responsibleNode != null) {
+                    responsibleNode.addData(keyIndex);
+                    System.out.println("Assigned keyIndex " + keyIndex + " to node: " + responsibleNode.getName());
+                }
             }
         }
     }
@@ -162,7 +157,7 @@ public class ChordProtocol implements Protocol {
                 // calculate interval: (start, end)
                 // handle wrap-around case for the last entry
                 int start = (nodeId + (1 << (i - 1))) % (1 << m); // calculate starting value for entry
-                int end = (i == m) ? start : (nodeId + (1 << i)) % (1 << m); //(nodeId + (1 << i)) % (1 << m);// -1; // consider removing -1 //(start + (i << (i - 1))) % (1 << m);
+                int end = (i == m) ? start : (nodeId + (1 << i)) % (1 << m);
                 if (i != m) end = (end - 1 + (1 << m)) % (1 << m); // wrap around logic for intervals
 
                 Interval interval = new Interval(start, end);
@@ -170,10 +165,9 @@ public class ChordProtocol implements Protocol {
 
                 if (successor != null) {
                     fingerTable.addEntry(new FingerTableEntry(start, interval, successor)); // add entry to finger table
-                    successor.addData(start); // endure responsible node has the key in its data set
+                    successor.addData(start); // ensure responsible node has the key in its data set
                 }
             }
-
             // set finger table for current node
             node.setRoutingTable(fingerTable);
         }
@@ -190,7 +184,7 @@ public class ChordProtocol implements Protocol {
                 return candidate; // found successor within interval
             }
         }
-        // if no valid successor found, return null
+        // if no valid successor found
         return null;
     }
 
@@ -222,7 +216,7 @@ public class ChordProtocol implements Protocol {
 
             // check if current node or its successor contains the key
             if (isResponsibleForKey(currentNode, keyIndex)) {
-                // here: find out where the data is, it might be in a successor and not current node
+                // todo: refactor into helper method
                 System.out.println("Checking current " + currentNode.getName() + " for keyIndex " + keyIndex + " with data: " + currentNode.getData().toString());
                 LookUpResponse currentNodeResponse = new LookUpResponse(route, keyIndex, currentNode.getName());
                 LinkedHashSet<Integer> currentDataItems = (LinkedHashSet<Integer>) currentNode.getData();
@@ -240,20 +234,16 @@ public class ChordProtocol implements Protocol {
                         return successorNodeResponse;
                     }
                 }
-
-                //return new LookUpResponse(route, keyIndex, currentNode.getName());
-                //return new LookUpResponse(route, currentNode.getId(), currentNode.getName());
             }
 
             // traverse finger table to find next appropriate node
             FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
-            NodeInterface nextNode = findClosestPrecedingNode(fingerTable, keyIndex, currentNode);
+            NodeInterface nextNode = findClosestPrecedingNode(fingerTable, keyIndex);
 
-            // check if lookup wraps around to start of ring
+            // check if lookup wraps around to start of ring - hasn't been called yet, consider removing
             if (nextNode == null || nextNode.equals(currentNode)) {
                 System.out.println("Key wraps around; returning first node in ring.");
                 nextNode = this.network.getTopology().values().iterator().next();
-                //break;
             }
 
             System.out.println("Moving to next node: " + nextNode.getName() + " with ID: " + nextNode.getId());
@@ -261,7 +251,6 @@ public class ChordProtocol implements Protocol {
             hopCount++;
             currentNode = nextNode;
         }
-        //return new LookUpResponse(route, hopCount, currentNode.getName());
     }
 
 
@@ -276,7 +265,7 @@ public class ChordProtocol implements Protocol {
                 (nodeId == successorId && nodeId == keyIndex); // exact match at boundary
     }
 
-    private NodeInterface findClosestPrecedingNode(FingerTable fingerTable, int keyIndex, NodeInterface currentNode) {
+    private NodeInterface findClosestPrecedingNode(FingerTable fingerTable, int keyIndex) {
         for (int i = fingerTable.getEntries().size() - 1; i >= 0; i--) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
             int nodeId = entry.successor().getId();
@@ -284,15 +273,7 @@ public class ChordProtocol implements Protocol {
             if (nodeId < keyIndex) {
                 return entry.successor(); // Return the first node that is closer to keyIndex
             }
-//            if (nodeId >= currentNode.getId() && nodeId < keyIndex) {
-//                // ensure next node is not current node
-//                if (!entry.successor().equals(currentNode)) {
-//                    return entry.successor();
-//                }
-//            }
         }
-        // fallback to first entry in finger table if no closer preceding node found
         return null;
-        //return fingerTable.getEntries().get(0).successor();
     }
 }

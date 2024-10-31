@@ -53,25 +53,18 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 
 **Not implemented yet:**
 - ChordProtocolSimulator.java
-  - [ ] `start()`
-  - [ ] `checkResponse(int keyIndex, String peerName)`
+  - [ ] `start()` - output logic
 - ChordProtocol.java
   - [x] `buildOverlayNetwork()`
   - [x] `buildFingerTable()`
-  - [ ] `lookUp(int keyIndex)`
+  - [x] `lookUp(int keyIndex)`
 - Node.java
-  - [ ] `print()`
-  - [ ] `removeNeighbor(String name)`
-  - [ ] `removeData(Object data)`
-  - [ ] `setId(int id)`
-  - [ ] `getNeighbor(String name)`
-  - [ ] `addNeighbor(String name, NodeInterface node)`
-  - [ ] `setRoutingTable(Object obj)`
-  - [ ] `getRoutingTable()`
+  - [ ] `removeNeighbor(String name)` - todo: read assignment description again
+  - [ ] `removeData(Object data)` - todo: read assignment description again
 - Network.java
-  - [ ] `removeNode(String name)`
+  - [ ] `removeNode(String name)` - todo: read assignment description again
 - ConsistentHashing.java
-  - [ ] `test()`
+  - [ ] `test()` - ?
 
 ### Technical features
 The synopsis for running the experiment is as follows:

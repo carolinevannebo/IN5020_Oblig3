@@ -228,7 +228,7 @@ public class ChordProtocolSimulator {
 
             System.out.println(response.toString());
             // check whether the returned node index is correct or not
-            if (checkResponse(entry.getValue(), response.node_name)) { // lookup fails here
+            if (checkResponse(entry.getValue(), response.node_name)) {
                 System.out.println("lookup successful for " + entry.getKey() + " with value " + entry.getValue());
             } else {
                 System.out.println("lookup failed for " + entry.getKey() + " with value " + entry.getValue());
@@ -245,16 +245,16 @@ public class ChordProtocolSimulator {
      * @return true if the node stores the key index otherwise return false
      */
     public boolean checkResponse(int keyIndex, String peerName) {
-        NodeInterface node = this.network.getTopology().get(peerName); // peerName: "Node 5" network: Network@938
+        NodeInterface node = this.network.getTopology().get(peerName);
         if (node == null) {
             System.err.println("Node " + peerName + " not found");
             return false;
         }
 
-        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast data should include 932 but doesn't
+        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast
         System.out.println(peerName + " contains data items: " + dataItems + ", keyIndex is " + keyIndex + ", nodeId is " + node.getId());
         for (Integer data : dataItems) {
-            if (data == keyIndex) { // keyIndex: 932 data: 669
+            if (data == keyIndex) {
                 return true;
             }
         }
@@ -293,7 +293,7 @@ public class ChordProtocolSimulator {
         testLookUp();
 
         /*
-        implement this logic
+        todo: implement output logic
          */
         // Look up all the key, print out as required in the Assignment Description
     }
