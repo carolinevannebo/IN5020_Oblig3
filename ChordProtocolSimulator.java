@@ -229,9 +229,9 @@ public class ChordProtocolSimulator {
             System.out.println(response.toString());
             // check whether the returned node index is correct or not
             if (checkResponse(entry.getValue(), response.node_name)) { // lookup fails here
-                System.out.println("lookup successful for " + entry.getKey());
+                System.out.println("lookup successful for " + entry.getKey() + " with value " + entry.getValue());
             } else {
-                System.out.println("lookup failed for " + entry.getKey());
+                System.out.println("lookup failed for " + entry.getKey() + " with value " + entry.getValue());
                 break;
             }
         }
@@ -251,8 +251,8 @@ public class ChordProtocolSimulator {
             return false;
         }
 
-        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast data should be 932 but returns 669
-        System.out.println("Node " + peerName + " contains data items: " + dataItems);
+        LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast data should include 932 but doesn't
+        System.out.println(peerName + " contains data items: " + dataItems + ", keyIndex is " + keyIndex + ", nodeId is " + node.getId());
         for (Integer data : dataItems) {
             if (data == keyIndex) { // keyIndex: 932 data: 669
                 return true;
