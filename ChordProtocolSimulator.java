@@ -204,7 +204,7 @@ public class ChordProtocolSimulator {
             System.out.print(" --- " + next.getName());
             next = next.getSuccessor();
             if (next.getName().equals(head.getName())) {
-                System.out.print(" --- "+next.getName() + "\n");
+                System.out.print(" --- " + next.getName() + "\n");
                 break;
             }
         }
@@ -252,6 +252,7 @@ public class ChordProtocolSimulator {
         }
 
         LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) this.network.getNode(peerName).getData(); // unchecked cast data should be 932 but returns 669
+        System.out.println("Node " + peerName + " contains data items: " + dataItems);
         for (Integer data : dataItems) {
             if (data == keyIndex) { // keyIndex: 932 data: 669
                 return true;

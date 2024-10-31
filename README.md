@@ -42,7 +42,7 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 **Run configurations:**
 1. `Java Simulator 10 10`
 2. `Java Simulator 100 20`
-3. `Java Simulator 100 20`
+3. `Java Simulator 1000 20`
 
 ### Work distribution
 | Caroline            | Liang  |
@@ -101,7 +101,7 @@ if m is 3 then the identifier value can range from 0 to 7.
   all the printing to files).
   - Node count=10, m=10 
   - Node count=100, m=20 
-  - Node count=100, m=20
+  - Node count=1000, m=20
 - All the code must be well commented.
 
 ### References

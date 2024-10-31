@@ -101,6 +101,12 @@ public class ChordProtocol implements Protocol {
 
         // add neighbour to peer node
         int nodeCount = sortedNodes.size();
+
+        if (nodeCount < 2) {
+            System.out.println("Not enough nodes to form a ring");
+            return;
+        }
+
         for (int i = 0; i < nodeCount; i++) {
             NodeInterface currentNode = sortedNodes.get(i).getValue();
             NodeInterface nextNode = sortedNodes.get((i + 1) % nodeCount).getValue(); // ensure ring topology by wrapping around
@@ -128,7 +134,7 @@ public class ChordProtocol implements Protocol {
      */
     public void buildFingerTable() {
         List<NodeInterface> nodes = new ArrayList<>(network.getTopology().values());
-        nodes.sort(Comparator.comparingInt(NodeInterface::getId));
+        //nodes.sort(Comparator.comparingInt(NodeInterface::getId));
 
         // build finger table
         for (NodeInterface node : nodes) {
@@ -136,17 +142,22 @@ public class ChordProtocol implements Protocol {
             FingerTable fingerTable = new FingerTable(m);
 
             for (int i = 1; i <= m; i++) {
-                // calculate starting value for entry
-                int start = (nodeId + (1 << (i - 1))) % (1 << m);
-                // find successor node for starting value
-                NodeInterface successor = findSuccessor(start, nodes);
+                int start = (nodeId + (1 << (i - 1))) % (1 << m); // calculate starting value for entry
+                NodeInterface successor = findSuccessor(start, nodes); // find successor node for starting value
+
                 // calculate interval: (start, nextStart)
                 // handle wrap-around case for the last entry
-                int nextStart = ((nodeId + (1 << i)) % (1 << m)); //(start + (i << (i - 1))) % (1 << m);
+                int nextStart = (nodeId + (1 << i)) % (1 << m); //(start + (i << (i - 1))) % (1 << m);
                 Interval interval = new Interval(start, nextStart);
 
-                // add entry to finger table
-                fingerTable.addEntry(new FingerTableEntry(start, interval, successor));
+                if (interval.contains(successor.getId())) {
+                    System.out.println("Successor ID " + successor.getId() + " is in the interval: " + interval + " (VALID) - entry added");
+
+                    fingerTable.addEntry(new FingerTableEntry(start, interval, successor)); // add entry to finger table
+                    successor.addData(start); // endure responsible node has the key in its data set
+                } else {
+                    System.out.println("Successor ID " + successor.getId() + " is not in the interval: " + interval + " (INVALID) - entry NOT added");
+                }
             }
 
             // set finger table for current node
@@ -196,6 +207,7 @@ public class ChordProtocol implements Protocol {
                 System.out.println("Found key at node: " + currentNode.getName());
                 //return new LookUpResponse(route, hopCount, currentNode.getName() + ": " + currentNode.getId());
                 return new LookUpResponse(route, keyIndex, currentNode.getName());
+
             }
 
             // traverse finger table to find next appropriate node
@@ -233,6 +245,7 @@ public class ChordProtocol implements Protocol {
         for (int i = fingerTable.getEntries().size() - 1; i >= 0; i--) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
             int nodeId = entry.node().getId();
+
             if (nodeId >= currentNode.getId() && nodeId < keyIndex) {
                 // ensure next node is not current node
                 if (!entry.node().equals(currentNode)) {
