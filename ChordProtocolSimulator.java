@@ -217,7 +217,9 @@ public class ChordProtocolSimulator {
      * index (check response) is used for the comparison.
      */
     public void testLookUp() {
-        for (Map.Entry<String, Integer> entry: keyIndexes.entrySet()) {
+        HashMap<String, LookUpResponse> lookUps = new HashMap<>();
+        Map<String, Integer> entries = keyIndexes;
+        for (Map.Entry<String, Integer> entry: entries.entrySet()) {
             // lookup the key index
             LookUpResponse response = protocol.lookUp(entry.getValue());
 
@@ -230,10 +232,20 @@ public class ChordProtocolSimulator {
             // check whether the returned node index is correct or not
             if (checkResponse(entry.getValue(), response.node_name)) {
                 System.out.println("lookup successful for " + entry.getKey() + " with value " + entry.getValue());
+                lookUps.put(entry.getKey(), response);
             } else {
                 System.out.println("lookup failed for " + entry.getKey() + " with value " + entry.getValue());
                 break;
             }
+        }
+
+        System.out.println("........printing lookups ..............");
+        for (HashMap.Entry<String, LookUpResponse> entry: lookUps.entrySet()) {
+            System.out.print(entry.getKey() + ": " + entries.get(entry.getKey()));
+            System.out.print("\t" + entry.getValue().node_name + ": " + entry.getValue().node_index);
+            System.out.print("\thop count: " + entry.getValue().peers_looked_up.size());
+            System.out.print("\troute: " + entry.getValue().peers_looked_up.toString());
+            System.out.println();
         }
     }
 
