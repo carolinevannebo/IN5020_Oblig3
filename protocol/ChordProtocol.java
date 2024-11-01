@@ -204,7 +204,7 @@ public class ChordProtocol implements Protocol {
      * @return names of nodes that have been searched and the final node that contains the key
      */
     public LookUpResponse lookUp(int keyIndex) {
-        NodeInterface currentNode = this.network.getTopology().values().iterator().next(); // starts at node 4, is that okay?
+        NodeInterface currentNode = this.network.getTopology().values().iterator().next();//.getOrDefault("Node 1", this.network.getTopology().values().iterator().next());
         LinkedHashSet<String> route = new LinkedHashSet<>();
         route.add(currentNode.getName());
         int hopCount = 0;
@@ -239,6 +239,7 @@ public class ChordProtocol implements Protocol {
             if (nextNode == null || nextNode.equals(currentNode)) {
                 System.out.println("Key wraps around; returning first node in ring.");
                 nextNode = this.network.getTopology().values().iterator().next();
+                break;
             }
 
             System.out.println("Moving to next node: " + nextNode.getName() + " with ID: " + nextNode.getId());
@@ -246,6 +247,7 @@ public class ChordProtocol implements Protocol {
             hopCount++;
             currentNode = nextNode;
         }
+        return getResponseForNode(route, keyIndex, currentNode);
     }
 
     private LookUpResponse getResponseForNode(LinkedHashSet<String> route, int keyIndex, NodeInterface node) {
@@ -276,11 +278,16 @@ public class ChordProtocol implements Protocol {
         }
         for (int i = fingerTable.getEntries().size() - 1; i >= 0; i--) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
+            int start = entry.interval().start();
+            int end = entry.interval().end();
             int nodeId = entry.successor().getId();
 
-            if (nodeId < keyIndex) {
-                return entry.successor(); // Return the first node that is closer to keyIndex
+            if ((start <= keyIndex && keyIndex <= end) || nodeId < keyIndex) {
+                return entry.successor();
             }
+//            if (nodeId < keyIndex) {
+//                return entry.successor(); // Return the first node that is closer to keyIndex
+//            }
         }
         return null;
     }
