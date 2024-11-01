@@ -215,6 +215,7 @@ public class ChordProtocol implements Protocol {
         }
 
         while (true) {
+            if (route.contains(currentNode.getName())) {}
             System.out.println("Checking node: " + currentNode.getName() + " with ID: " + currentNode.getId());
 
             // check if current node or its successor contains the key
@@ -285,9 +286,6 @@ public class ChordProtocol implements Protocol {
             if ((start <= keyIndex && keyIndex <= end) || nodeId < keyIndex) {
                 return entry.successor();
             }
-//            if (nodeId < keyIndex) {
-//                return entry.successor(); // Return the first node that is closer to keyIndex
-//            }
         }
         return null;
     }
