@@ -210,6 +210,9 @@ public class ChordProtocol implements Protocol {
         int hopCount = 0;
 
         System.out.println("Looking up EntrySet value " + keyIndex);
+        if (keyIndex == 648861) {
+            System.out.println("hard one incoming"); // for breakpoint
+        }
 
         while (true) {
             System.out.println("Checking node: " + currentNode.getName() + " with ID: " + currentNode.getId());
@@ -221,6 +224,9 @@ public class ChordProtocol implements Protocol {
                 if (response == null) {
                     System.out.println("Checking successor " + currentNode.getSuccessor().getName() + " for keyIndex " + keyIndex + " with data: " + currentNode.getSuccessor().getData().toString());
                     response = getResponseForNode(route, keyIndex, currentNode.getSuccessor());
+                }
+                if (keyIndex == 648861) {
+                    System.out.println("hard one done"); // for breakpoint
                 }
                 return response;
             }
@@ -253,7 +259,6 @@ public class ChordProtocol implements Protocol {
         return null;
     }
 
-
     private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
         NodeInterface successor = node.getSuccessor();
         int nodeId = node.getId();
@@ -266,6 +271,9 @@ public class ChordProtocol implements Protocol {
     }
 
     private NodeInterface findClosestPrecedingNode(FingerTable fingerTable, int keyIndex) {
+        if (keyIndex == 648861) {
+            System.out.println("hard one working"); // for breakpoint
+        }
         for (int i = fingerTable.getEntries().size() - 1; i >= 0; i--) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
             int nodeId = entry.successor().getId();
