@@ -179,7 +179,7 @@ public class ChordProtocol implements Protocol {
      * @return names of nodes that have been searched and the final node that contains the key
      */
     public LookUpResponse lookUp(int keyIndex) {
-        NodeInterface currentNode = (Node) network.getNode("Node 1");//this.network.getTopology().values().iterator().next();//.getOrDefault("Node 1", this.network.getTopology().values().iterator().next());
+        NodeInterface currentNode = network.getNode("Node 1");
         LinkedHashSet<String> route = new LinkedHashSet<>();
         route.add(currentNode.getName());
         int hopCount = 0;
@@ -228,7 +228,7 @@ public class ChordProtocol implements Protocol {
         return null;
     }
 
-    /*private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
+    private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
         NodeInterface successor = node.getSuccessor();
         int nodeId = node.getId();
         int successorId = successor.getId();
@@ -237,7 +237,7 @@ public class ChordProtocol implements Protocol {
         return (nodeId < keyIndex && keyIndex <= successorId) ||
                 (nodeId > successorId && (keyIndex >= nodeId || keyIndex < successorId)) ||
                 (nodeId == successorId && nodeId == keyIndex); // exact match at boundary
-    }*/
+    }
 
     private NodeInterface findNextNode(FingerTable fingerTable, int keyIndex, LinkedHashSet<String> route, NodeInterface node) {
         if (keyIndex == 648861) {
