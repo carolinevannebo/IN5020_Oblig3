@@ -26,7 +26,6 @@ public class ChordProtocol implements Protocol {
     // key indexes. tuples of (<key name>, <key index>)
     public HashMap<String, Integer> keyIndexes;
 
-
     public ChordProtocol(int m) {
         this.m = m;
         setHashFunction();
@@ -180,7 +179,6 @@ public class ChordProtocol implements Protocol {
         NodeInterface currentNode = network.getNode("Node 1");
         LinkedHashSet<String> route = new LinkedHashSet<>();
         route.add(currentNode.getName());
-        int hopCount = 0;
 
         System.out.println("Looking up EntrySet value " + keyIndex);
 
@@ -204,7 +202,6 @@ public class ChordProtocol implements Protocol {
             }
 
             route.add(nextNode.getName());
-            hopCount++;
             currentNode = nextNode;
         }
         return getResponseForNode(route, keyIndex, currentNode);
@@ -220,17 +217,6 @@ public class ChordProtocol implements Protocol {
         }
         return null;
     }
-
-//    private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
-//        NodeInterface successor = node.getSuccessor();
-//        int nodeId = node.getId();
-//        int successorId = successor.getId();
-//
-//        // standard check within range of current node and successor
-//        return (nodeId < keyIndex && keyIndex <= successorId) ||
-//                (nodeId > successorId && (keyIndex >= nodeId || keyIndex < successorId)) ||
-//                (nodeId == successorId && nodeId == keyIndex); // exact match at boundary
-//    }
 
     private NodeInterface findNextNode(FingerTable fingerTable) {
         for (int i = 0; i < fingerTable.getEntries().size(); i++) {

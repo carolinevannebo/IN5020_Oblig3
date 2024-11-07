@@ -196,7 +196,6 @@ public class ChordProtocolSimulator {
         }
         System.out.println("........printing ring..............");
 
-        // or assert not null?
         if (head == null || head.getNeighbors().isEmpty()) {
             return;
         }
