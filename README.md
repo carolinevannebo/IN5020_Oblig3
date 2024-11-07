@@ -45,26 +45,11 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 3. `Java Simulator 1000 20`
 
 ### Work distribution
-| Caroline            | Liang  |
-|---------------------|--------|
-| buildOverlayNetwork | item   |
-| buildFingerTable    | item   |
-| lookUp              | item   |
-
-**Not implemented yet:**
-- ChordProtocolSimulator.java
-  - [ ] `start()` - output logic
-- ChordProtocol.java
-  - [x] `buildOverlayNetwork()`
-  - [x] `buildFingerTable()`
-  - [x] `lookUp(int keyIndex)`
-- Node.java
-  - [ ] `removeNeighbor(String name)` - todo: read assignment description again
-  - [ ] `removeData(Object data)` - todo: read assignment description again
-- Network.java
-  - [ ] `removeNode(String name)` - todo: read assignment description again
-- ConsistentHashing.java
-  - [ ] `test()` - ?
+| Caroline            | Liang         |
+|---------------------|---------------|
+| buildOverlayNetwork | checking math |
+| buildFingerTable    |               |
+| lookUp              |               |
 
 ### Technical features
 The synopsis for running the experiment is as follows:
