@@ -243,6 +243,7 @@ public class ChordProtocolSimulator {
             }
         }
 
+        // Look up all the key, print out as required in the Assignment Description
         System.out.println("........printing lookups ..............");
         for (HashMap.Entry<String, LookUpResponse> entry: lookUps.entrySet()) {
             System.out.print(entry.getKey() + ": " + entries.get(entry.getKey()));
@@ -329,10 +330,5 @@ public class ChordProtocolSimulator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*
-        todo: implement output logic
-         */
-        // Look up all the key, print out as required in the Assignment Description
     }
 }

@@ -127,8 +127,6 @@ public class ChordProtocol implements Protocol {
         // build finger table
         for (NodeInterface node : nodes) {
             int nodeId = node.getId();
-            System.out.println("\t\tBuilding the finger table for node " + node.getName() + " with index " + nodeId);
-
             FingerTable fingerTable = new FingerTable(m);
 
             for (int i = 1; i <= m; i++) {
@@ -185,19 +183,15 @@ public class ChordProtocol implements Protocol {
         int hopCount = 0;
 
         System.out.println("Looking up EntrySet value " + keyIndex);
-        if (keyIndex == 648861) {
-            System.out.println("hard one incoming"); // for breakpoint
-        }
 
         while (true) {
             // check if current node or its successor contains the key
-            System.out.println("Checking current " + currentNode.getName() + " with ID: " + currentNode.getId() + " for keyIndex " + keyIndex + " with data: " + currentNode.getData().toString());
             LookUpResponse response = getResponseForNode(route, keyIndex, currentNode);
             if (response != null) return response;
 
             // traverse finger table to find next appropriate node
             FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
-            NodeInterface nextNode = findNextNode(fingerTable, keyIndex, route, currentNode);
+            NodeInterface nextNode = findNextNode(fingerTable);
 
             // check if lookup wraps around to start of ring - hasn't been called yet, consider removing
             if (nextNode == null) {
@@ -209,7 +203,6 @@ public class ChordProtocol implements Protocol {
                 nextNode = this.network.getTopology().values().iterator().next();
             }
 
-            System.out.println("Moving to next node: " + nextNode.getName() + " with ID: " + nextNode.getId());
             route.add(nextNode.getName());
             hopCount++;
             currentNode = nextNode;
@@ -228,32 +221,22 @@ public class ChordProtocol implements Protocol {
         return null;
     }
 
-    private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
-        NodeInterface successor = node.getSuccessor();
-        int nodeId = node.getId();
-        int successorId = successor.getId();
+//    private boolean isResponsibleForKey(NodeInterface node, int keyIndex) {
+//        NodeInterface successor = node.getSuccessor();
+//        int nodeId = node.getId();
+//        int successorId = successor.getId();
+//
+//        // standard check within range of current node and successor
+//        return (nodeId < keyIndex && keyIndex <= successorId) ||
+//                (nodeId > successorId && (keyIndex >= nodeId || keyIndex < successorId)) ||
+//                (nodeId == successorId && nodeId == keyIndex); // exact match at boundary
+//    }
 
-        // standard check within range of current node and successor
-        return (nodeId < keyIndex && keyIndex <= successorId) ||
-                (nodeId > successorId && (keyIndex >= nodeId || keyIndex < successorId)) ||
-                (nodeId == successorId && nodeId == keyIndex); // exact match at boundary
-    }
-
-    private NodeInterface findNextNode(FingerTable fingerTable, int keyIndex, LinkedHashSet<String> route, NodeInterface node) {
-        if (keyIndex == 648861) {
-            System.out.println("hard one working"); // for breakpoint
-        }
-        System.out.println("Trying to find the next node");
-        //List<NodeInterface> topologyNodes = new ArrayList<>(this.network.getTopology().values());
-
-        System.out.println("finger table size " + fingerTable.getEntries().size());
+    private NodeInterface findNextNode(FingerTable fingerTable) {
         for (int i = 0; i < fingerTable.getEntries().size(); i++) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
-            //int start = entry.interval().start();
-            //int end = entry.interval().end();
             int nodeId = entry.successor().getId();
 
-            System.out.println("looking at " + entry);
             if (entry.interval().contains(nodeId)) {
                 return entry.successor();
             }
