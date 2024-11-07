@@ -6,6 +6,9 @@ import protocol.ChordProtocol;
 import protocol.LookUpResponse;
 import protocol.Protocol;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -216,8 +219,9 @@ public class ChordProtocolSimulator {
      * lookup from the chord protocol and returns the node index. It then compares the node index with the correct node
      * index (check response) is used for the comparison.
      */
-    public void testLookUp() {
+    public List<String> testLookUp() {
         HashMap<String, LookUpResponse> lookUps = new HashMap<>();
+        List<String> output = new ArrayList<>();
         Map<String, Integer> entries = keyIndexes;
         for (Map.Entry<String, Integer> entry: entries.entrySet()) {
             // lookup the key index
@@ -225,7 +229,7 @@ public class ChordProtocolSimulator {
 
             if (response == null) {
                 System.out.println("Key " + entry.getKey() + " not found");
-                return;
+                return new ArrayList<>();
             }
 
             System.out.println(response.toString());
@@ -246,7 +250,14 @@ public class ChordProtocolSimulator {
             System.out.print("\thop count: " + entry.getValue().peers_looked_up.size());
             System.out.print("\troute: " + entry.getValue().peers_looked_up.toString());
             System.out.println();
+
+            String outputLine = entry.getKey() + ": " + entries.get(entry.getKey()) +
+                    "\t" + entry.getValue().node_name + ": " + entry.getValue().node_index +
+                    "\thop count: " + entry.getValue().peers_looked_up.size() +
+                    "\troute: " + entry.getValue().peers_looked_up.toString();
+            output.add(outputLine);
         }
+        return output;
     }
 
     /**
@@ -295,14 +306,29 @@ public class ChordProtocolSimulator {
      *     2) generate keys and assign it to nodes
      *     3) tests the lookup operation (only if necessary)
      */
-    public void start() {
+    public void start(String[] args) {
         // builds the protocol
         buildProtocol();
         printRing();
         printNetwork();
 
         // tests the lookup operation
-        testLookUp();
+        List<String> output = testLookUp();
+
+        // output
+        BufferedWriter bufferedWriter;
+        String outputFile = System.getProperty("user.dir") + "/output/output_" + args[0] + "_" + args[1] + ".txt";
+        try (FileWriter fileWriter = new FileWriter(outputFile, false)) {
+            // Opening the file in write mode without appending clears the file
+            bufferedWriter = new BufferedWriter(new FileWriter(outputFile, true));
+            for (String outputLine : output) {
+                bufferedWriter.write(outputLine);
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         /*
         todo: implement output logic

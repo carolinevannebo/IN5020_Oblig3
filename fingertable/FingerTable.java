@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FingerTable {
-    private final List<FingerTableEntry> entries; // todo: sjekk ut 2D array
+    private final List<FingerTableEntry> entries;
 
     public FingerTable(int size) {
         this.entries = new ArrayList<>(size);
