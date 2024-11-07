@@ -44,6 +44,27 @@ assigns keys to nodes. You have to do the implementation in the `ChordProtocol` 
 2. `Java Simulator 100 20`
 3. `Java Simulator 1000 20`
 
+### About
+**The overlay network** is implemented as a circular ring where each node has a unique identifier, 
+mapped using consistent hashing. Firstly the current network topology is retrieved, and each entry 
+inside can represent a node with its associated hash value. 
+And then nodes are sorted in ascending order based on their IDs, 
+which allows each node to have a single successor and predecessor in the ring, forming a circle. 
+Once sorted, the method connects each node to its immediate neighbor, ensuring each node knows its successor. 
+And the last node in the sorted list connects back to the first node, thus creating a ring structure.
+
+**The finger table** is a routing table that helps each node locate other nodes in the distributed network. 
+The construction of finger table begins with retrieving a list of all nodes in the network. 
+And then each node is going through a loop to calculate the start and end  of each finger interval to form its finger table. 
+`findSuccessor()` is used to search for the first node in the ring that is responsible for the range starting from this start position within the interval, 
+and this node becomes the successor for the interval.
+
+**The lookup method** in the Chord protocol is designed to find the node responsible for a specific key in the distributed network. 
+The lookup process always starts with node 1, and a loop begins to iteratively check if currentNode contains the key or if it should forward the request to another node. 
+If the currentNode contains the target key, the route and the node that has the keys will be returned and the lookup will be terminated. 
+If currentNode does not have the key, `findNextNode()` would consult its finger table to determine the closest node responsible for the key's range to visit next, 
+and meanwhile the route and hopCount would be updated.
+
 ### Work distribution
 | Caroline            | Liang         |
 |---------------------|---------------|
