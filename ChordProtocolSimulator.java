@@ -221,8 +221,8 @@ public class ChordProtocolSimulator {
     public List<String> testLookUp() {
         HashMap<String, LookUpResponse> lookUps = new HashMap<>();
         List<String> output = new ArrayList<>();
-        List<Integer> hopCounts = new ArrayList<>();
         int totalHops = 0;
+        int lookupCount = 0;
 
         Map<String, Integer> entries = keyIndexes;
         for (Map.Entry<String, Integer> entry: entries.entrySet()) {
@@ -248,6 +248,10 @@ public class ChordProtocolSimulator {
         // Look up all the key, print out as required in the Assignment Description
         System.out.println("........printing lookups ..............");
         for (HashMap.Entry<String, LookUpResponse> entry: lookUps.entrySet()) {
+            int hopCount = entry.getValue().peers_looked_up.size();
+            totalHops += hopCount;
+            lookupCount++;
+
             System.out.print(entry.getKey() + ": " + entries.get(entry.getKey()));
             System.out.print("\t" + entry.getValue().node_name + ": " + entry.getValue().node_index);
             System.out.print("\thop count: " + entry.getValue().peers_looked_up.size());
@@ -256,19 +260,19 @@ public class ChordProtocolSimulator {
 
             String outputLine = entry.getKey() + ": " + entries.get(entry.getKey()) +
                     "\t" + entry.getValue().node_name + ": " + entry.getValue().node_index +
-                    "\thop count: " + entry.getValue().peers_looked_up.size() +
+                    "\thop count: " + hopCount +
                     "\troute: " + entry.getValue().peers_looked_up.toString();
             output.add(outputLine);
-            hopCounts.add(entry.getValue().peers_looked_up.size());
         }
         // calculate average form hopCounts
-        for (int hop : hopCounts) {
-            totalHops += hop;
-        }
-
-        double average = hopCounts.isEmpty() ? 0 : (double) totalHops / hopCounts.size();
+        double average = lookupCount == 0 ? 0 : (double) totalHops / lookupCount;
         System.out.println("\naverage hop count: " + average);
         output.add("\naverage hop count: " + average);
+
+        int nodeCount = network.getTopology().size();
+        double estimatedAverageHopCount = 0.5 * Math.log(nodeCount) / Math.log(2);
+        System.out.println("estimated average hop count: " + estimatedAverageHopCount);
+        output.add("estimated average hop count: " + estimatedAverageHopCount);
 
         return output;
     }

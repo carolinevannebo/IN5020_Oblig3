@@ -12,3 +12,8 @@ public record Interval(int start, int end) {
         }
     }
 }
+
+// configurations should be
+// 10: 1.66
+// 100: 3.3
+// 1000: 5
