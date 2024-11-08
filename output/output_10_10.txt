@@ -1,8 +1,8 @@
-key 4: 669	Node 5: 669	hop count: 3	route: [Node 8, Node 6, Node 5]
-key 3: 382	Node 7: 382	hop count: 1	route: [Node 7]
-key 2: 144	Node 2: 144	hop count: 4	route: [Node 5, Node 4, Node 3, Node 2]
-key 1: 932	Node 9: 932	hop count: 2	route: [Node 5, Node 9]
-key 5: 489	Node 8: 489	hop count: 2	route: [Node 7, Node 8]
+key 4: 669	Node 5: 669	hop count: 3	route: [Node 1, Node 8, Node 6]
+key 3: 382	Node 7: 382	hop count: 1	route: [Node 1]
+key 2: 144	Node 2: 144	hop count: 4	route: [Node 1, Node 5, Node 4, Node 3]
+key 1: 932	Node 9: 932	hop count: 2	route: [Node 1, Node 5]
+key 5: 489	Node 8: 489	hop count: 2	route: [Node 1, Node 7]
 
 average hop count: 2.4
 estimated average hop count: 1.6609640474436813

@@ -174,7 +174,7 @@ public class ChordProtocol implements Protocol {
      * @return names of nodes that have been searched and the final node that contains the key
      */
     public LookUpResponse lookUp(int keyIndex) {
-        NodeInterface currentNode = network.getNode("Node 1");
+        NodeInterface currentNode = network.getTopology().get("Node 1");
         LinkedHashSet<String> route = new LinkedHashSet<>();
         System.out.println("Looking up EntrySet value " + keyIndex);
 
@@ -187,15 +187,10 @@ public class ChordProtocol implements Protocol {
             FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
             NodeInterface nextNode = findNextNode(fingerTable, keyIndex);
 
-            // check if lookup wraps around to start of ring - hasn't been called yet, consider removing
-            if (nextNode == null) break;
+            // check if lookup wraps around to start of ring
+            if (nextNode == null || nextNode.equals(currentNode)) break;
 
-            if (nextNode.equals(currentNode)) {
-                System.out.println("Key wraps around; returning next node in ring.");
-                nextNode = this.network.getTopology().values().iterator().next();
-            }
-
-            route.add(nextNode.getName());
+            route.add(currentNode.getName());
             currentNode = nextNode;
         }
         return getResponseForNode(route, keyIndex, currentNode);
@@ -206,6 +201,7 @@ public class ChordProtocol implements Protocol {
         LinkedHashSet<Integer> dataItems = (LinkedHashSet<Integer>) node.getData();
         for (Integer data : dataItems) {
             if (data == keyIndex) {
+                //System.out.println(response.toString());
                 return response;
             }
         }
