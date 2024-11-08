@@ -6,6 +6,6 @@ public record FingerTableEntry(int start, Interval interval, NodeInterface succe
 
     @Override
     public String toString() {
-        return "FingerTableEntry: {" + "start: " + start + ", interval: (" + interval.start() + "," + interval.end() + "), successor: " + successor.getName() + '}';
+        return "FingerTableEntry: {" + "start: " + start + ", interval: (" + interval.start() + "," + interval.end() + "), successor: " + successor.getId() + '}';
     }
 }

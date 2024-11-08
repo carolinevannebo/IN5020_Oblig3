@@ -5,7 +5,6 @@ import fingertable.FingerTable;
 import fingertable.FingerTableEntry;
 import fingertable.Interval;
 import p2p.NetworkInterface;
-import p2p.Node;
 import p2p.NodeInterface;
 
 import java.util.*;
@@ -132,14 +131,15 @@ public class ChordProtocol implements Protocol {
                 // calculate interval: (start, end)
                 // handle wrap-around case for the last entry
                 int start = (nodeId + (1 << (i - 1))) % (1 << m); // calculate starting value for entry
-                int end = (i == m) ? start : (nodeId + (1 << i)) % (1 << m);
-                //if (i != m) end = (end - 1 + (1 << m)) % (1 << m); // wrap around logic for intervals
+                int end = (i == m) ? nodeId : ((nodeId-1) + (1 << i)) % (1 << m);
 
                 Interval interval = new Interval(start, end);
-                NodeInterface successor = findSuccessor(start, interval, nodes); // find successor node for starting value
+                NodeInterface successor = findSuccessor(start, node.getSuccessor(), nodeId, m); // find successor node for starting value
 
                 if (successor != null) {
-                    fingerTable.addEntry(new FingerTableEntry(start, interval, successor)); // add entry to finger table
+                    FingerTableEntry entry = new FingerTableEntry(start, interval, successor);
+                    fingerTable.addEntry(entry); // add entry to finger table
+                    //System.out.println("adding entry: " + entry.toString() + " for successor " + successor.getId());
                 }
             }
             // set finger table for current node
@@ -147,17 +147,15 @@ public class ChordProtocol implements Protocol {
         }
     }
 
-    private NodeInterface findSuccessor(int start, Interval interval, List<NodeInterface> nodes) {
-        for (NodeInterface candidate : nodes) {
-            int candidateId = candidate.getId();
+    private NodeInterface findSuccessor(int start, NodeInterface candidate, int nodeId, int m) {
+        int newStart = start <= nodeId ? (int) (start + Math.pow(2, m)) : start;
+        int candidateId = candidate.getId() <= nodeId ? (int) (candidate.getId() + Math.pow(2, m)) : candidate.getId();
 
-            // check if candidate falls within the interval
-            if (candidateId >= start && interval.contains(candidateId)) {
-                return candidate; // found successor within interval
-            }
+        while (candidateId < newStart) {
+            candidate = candidate.getSuccessor();
+            candidateId = candidate.getId() <= nodeId ? (int) (candidate.getId() + Math.pow(2, m)) : candidate.getId();
         }
-        // if no valid successor found
-        return null;
+        return candidate;
     }
 
     /**
@@ -178,8 +176,6 @@ public class ChordProtocol implements Protocol {
     public LookUpResponse lookUp(int keyIndex) {
         NodeInterface currentNode = network.getNode("Node 1");
         LinkedHashSet<String> route = new LinkedHashSet<>();
-        route.add(currentNode.getName());
-
         System.out.println("Looking up EntrySet value " + keyIndex);
 
         while (true) {
@@ -189,12 +185,10 @@ public class ChordProtocol implements Protocol {
 
             // traverse finger table to find next appropriate node
             FingerTable fingerTable = (FingerTable) currentNode.getRoutingTable();
-            NodeInterface nextNode = findNextNode(fingerTable, keyIndex, currentNode);
+            NodeInterface nextNode = findNextNode(fingerTable, keyIndex);
 
             // check if lookup wraps around to start of ring - hasn't been called yet, consider removing
-            if (nextNode == null) {
-                break;
-            }
+            if (nextNode == null) break;
 
             if (nextNode.equals(currentNode)) {
                 System.out.println("Key wraps around; returning next node in ring.");
@@ -218,28 +212,14 @@ public class ChordProtocol implements Protocol {
         return null;
     }
 
-    private NodeInterface findNextNode(FingerTable fingerTable, int keyIndex, NodeInterface currentNode) {
-        NodeInterface closestPrecedingNode = null;
-
-        for (int i = fingerTable.getEntries().size() - 1; i >= 0; i--) {
+    private NodeInterface findNextNode(FingerTable fingerTable, int keyIndex) {
+        for (int i = 0; i < fingerTable.getEntries().size(); i++) {
             FingerTableEntry entry = fingerTable.getEntries().get(i);
-            int fingerNodeId = entry.successor().getId();
 
-            // Check if the finger node ID is between the current node ID and the target key
-            if (isBetween(currentNode.getId(), fingerNodeId, keyIndex)) {
-                closestPrecedingNode = entry.successor();
-                break;
+            if (entry.interval().contains(keyIndex)) {
+                return entry.successor();
             }
         }
-
-        return closestPrecedingNode != null ? closestPrecedingNode : currentNode.getSuccessor();
-    }
-
-    private boolean isBetween(int start, int id, int end) {
-        if (start < end) {
-            return start < id && id <= end;
-        } else { // wrap-around case
-            return start < id || id <= end;
-        }
+        return null;
     }
 }
