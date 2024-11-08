@@ -221,6 +221,9 @@ public class ChordProtocolSimulator {
     public List<String> testLookUp() {
         HashMap<String, LookUpResponse> lookUps = new HashMap<>();
         List<String> output = new ArrayList<>();
+        List<Integer> hopCounts = new ArrayList<>();
+        int totalHops = 0;
+
         Map<String, Integer> entries = keyIndexes;
         for (Map.Entry<String, Integer> entry: entries.entrySet()) {
             // lookup the key index
@@ -256,7 +259,17 @@ public class ChordProtocolSimulator {
                     "\thop count: " + entry.getValue().peers_looked_up.size() +
                     "\troute: " + entry.getValue().peers_looked_up.toString();
             output.add(outputLine);
+            hopCounts.add(entry.getValue().peers_looked_up.size());
         }
+        // calculate average form hopCounts
+        for (int hop : hopCounts) {
+            totalHops += hop;
+        }
+
+        double average = hopCounts.isEmpty() ? 0 : (double) totalHops / hopCounts.size();
+        System.out.println("\naverage hop count: " + average);
+        output.add("\naverage hop count: " + average);
+
         return output;
     }
 
