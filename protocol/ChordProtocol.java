@@ -218,17 +218,6 @@ public class ChordProtocol implements Protocol {
         return null;
     }
 
-//    private NodeInterface findNextNode(FingerTable fingerTable) {
-//        for (int i = 0; i < fingerTable.getEntries().size(); i++) {
-//            FingerTableEntry entry = fingerTable.getEntries().get(i);
-//            int nodeId = entry.successor().getId();
-//
-//            if (entry.interval().contains(nodeId)) {
-//                return entry.successor();
-//            }
-//        }
-//        return null;
-//    }
     private NodeInterface findNextNode(FingerTable fingerTable, int keyIndex, NodeInterface currentNode) {
         NodeInterface closestPrecedingNode = null;
 

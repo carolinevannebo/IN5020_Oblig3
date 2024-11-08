@@ -274,6 +274,11 @@ public class ChordProtocolSimulator {
         System.out.println("estimated average hop count: " + estimatedAverageHopCount);
         output.add("estimated average hop count: " + estimatedAverageHopCount);
 
+        // configurations should be
+        // 10: 1.66
+        // 100: 3.3
+        // 1000: 5
+
         return output;
     }
 
